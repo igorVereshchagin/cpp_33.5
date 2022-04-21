@@ -5,13 +5,24 @@
 
 class Fish : public std::exception
 {
-
+public:
+  const char * what() const noexcept override
+  {
+    return "Fish";
+  }
+  virtual ~Fish() {}
 };
 
 class Boot : public std::exception
 {
-
+public:
+  const char * what() const noexcept override
+  {
+    return "Boot";
+  }
+  virtual ~Boot() {}
 };
+
 
 int main()
 {
@@ -31,9 +42,9 @@ int main()
   }
   int sector;
   int ret = 0;
+  int counter = 0;
   bool caught = false;
-  Boot bootEx;
-  while (!caught)
+  while (!caught && (counter++ < 9))
   {
     do
     {
@@ -43,18 +54,22 @@ int main()
     try
     {
       if (pool[sector] != nullptr)
-        throw bootEx; //*(pool[sector]);
+        throw pool[sector];
     }
-    catch (const Fish &x)
+    catch (const std::exception* const x)
     {
-      std::cout << "Fish" << std::endl;
-      caught = true;
-      continue;
-    }
-    catch (const Boot &x)
-    {
-      std::cout << "Boot" << std::endl;
-      ret = -1;
+      const Fish* const pFish = dynamic_cast <const Fish* const>(x);
+      const Boot* const pBoot = dynamic_cast <const Boot* const>(x);
+      if (nullptr != pFish)
+      {
+        std::cout << pFish->what() << std::endl;
+        std::cout << "Number of attempts: " << counter << std::endl;
+      }
+      else if (nullptr != pBoot)
+      {
+        std::cout << pBoot->what() << std::endl;
+        ret = -1;
+      }
       caught = true;
       continue;
     }
