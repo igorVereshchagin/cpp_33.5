@@ -1,48 +1,43 @@
 #include <iostream>
-#include <map>
-#include <exception>
-
-void fillStore(std::map<std::string, int> &goods);
+#include "Store.h"
+#include "Cart.h"
 
 int main()
 {
-  std::map<std::string, int> goods;
-  bool goodInput = false;
-  while (!goodInput)
+  Store store;
+  Cart cart;
+  store.fill();
+  std::cout << store;
+  std::cout.flush();
+
+  std::string cmd;
+  do
   {
+    std::cin >> cmd;
     try
     {
-      fillStore(goods);
-      goodInput = true;
+      if ("add" == cmd)
+      {
+        std::string code;
+        int count;
+        std::cin >> code >> count;
+        cart.put(store.take(code, count));
+      } else if ("rem" == cmd)
+      {
+        std::string code;
+        int count;
+        std::cin >> code >> count;
+        store.put(cart.take(code, count));
+      }
     }
-    catch (const std::invalid_argument &x)
+    catch (const std::invalid_argument& x)
     {
       std::cerr << x.what() << std::endl;
     }
-  }
-
-  for (std::map<std::string, int>::iterator it = goods.begin(); it != goods.end(); it++)
-    std::cout << it->first << " " << it->second << std::endl;
-
-  return 0;
-}
-
-void fillStore(std::map<std::string, int> &goods)
-{
-  goods.clear();
-  std::string inputStr;
-  do
-  {
-    int inputInt;
-    std::cin >> inputStr;
-    if (inputStr == "end")
-      continue;
-    std::cin >> inputInt;
-    if (goods.find(inputStr) != goods.end())
+    catch (const std::runtime_error& x)
     {
-      std::cout << "article " << inputStr << " have been initialized already" << std::endl;
-      continue;
+      std::cerr << x.what() << std::endl;
     }
-    goods[inputStr] = inputInt;
-  }while (inputStr != "end");
+  } while ("exit" != cmd);
+  return 0;
 }

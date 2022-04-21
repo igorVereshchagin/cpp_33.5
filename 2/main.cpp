@@ -32,6 +32,7 @@ int main()
   int sector;
   int ret = 0;
   bool caught = false;
+  Boot bootEx;
   while (!caught)
   {
     do
@@ -42,7 +43,7 @@ int main()
     try
     {
       if (pool[sector] != nullptr)
-        throw *(pool[sector]);
+        throw bootEx; //*(pool[sector]);
     }
     catch (const Fish &x)
     {
